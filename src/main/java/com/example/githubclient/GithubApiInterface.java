@@ -11,7 +11,6 @@ public interface GithubApiInterface {
     Call<List<Repository>> listRepos(@Header("Authorization") String accessToken,
                                      @Header("Accept") String apiVersionSpec);
 
-    //repos/dddushesss/Geekrains_cs/pulls/1/commits
     @GET("/repos/{owner}/{repo}/pulls/{pull_number}/commits")
     Call<List<PullInfo>> listPullCommits(@Header("Authorization") String accessToken,
                                          @Header("Accept") String apiVersionSpec,
