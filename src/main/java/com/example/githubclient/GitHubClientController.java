@@ -1,6 +1,7 @@
 package com.example.githubclient;
 
 
+import com.example.githubclient.Model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,17 +19,31 @@ public class GitHubClientController {
         return githubService.getRepositories();
     }
 
-    @GetMapping("/puls/{owner}/{repo}")
+    @GetMapping("/pulls/{owner}/{repo}")
     public List<PullRequest> getPuls(@PathVariable("owner") String owner,
                                      @PathVariable("repo") String repoName) throws IOException {
-        return githubService.getPullRequses(owner, repoName);
+        return githubService.getPullRequests(owner, repoName);
     }
 
     @GetMapping("/pull/{owner}/{repo}/{pull_number}")
     public List<PullInfo> getComits(@PathVariable("owner") String owner,
                                     @PathVariable("repo") String repoName,
                                     @PathVariable("pull_number") Integer pullNumber) throws IOException {
-        return githubService.getPullRequset(owner, repoName, pullNumber);
+        return githubService.getPullRequests(owner, repoName, pullNumber);
+    }
+
+    @GetMapping("/{owner}/{repo}/issues")
+    public List<Issue> getIssues(@PathVariable("owner") String owner,
+                                 @PathVariable("repo") String repoName
+                                   ) throws IOException {
+        return githubService.getRepoIssues(owner, repoName);
+    }
+
+    @GetMapping("/pull/{owner}/{repo}/{pull_number}/comments")
+    public List<ReviewComment> getRevComs(@PathVariable("owner") String owner,
+                                          @PathVariable("repo") String repo,
+                                          @PathVariable("pull_number") Integer pullNum) throws IOException{
+        return githubService.getReview(owner, repo, pullNum);
     }
 
     @PostMapping("/repos")

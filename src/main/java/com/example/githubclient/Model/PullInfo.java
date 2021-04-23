@@ -1,12 +1,7 @@
-package com.example.githubclient;
+package com.example.githubclient.Model;
 
 import com.google.gson.annotations.SerializedName;
 
-class Commit {
-    @SerializedName("message")
-    public String message;
-
-}
 
 public class PullInfo {
 
