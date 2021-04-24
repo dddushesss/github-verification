@@ -24,27 +24,40 @@ public interface GithubApiInterface {
                                       @Header("Accept") String apiVersionSpec,
                                       @Path("repo") String repo, @Path("owner") String owner);
 
-    @GET("/repos/{owner}/{repo}/issues/comments")
+    @GET("/repos/{owner}/{repo}/issues/{issue_number}/comments")
     Call<List<Issue>> listIssues(@Header("Authorization") String accessToken,
                                  @Header("Accept") String apiVersionSpec,
                                  @Path("repo") String repo,
-                                 @Path("owner") String owner);
+                                 @Path("owner") String owner,
+                                 @Path("issue_number") Integer issueNum);
 
-    @GET("/repos/{owner}/{repo}/pulls/{pull_number}/comments")
+    @GET("/repos/{owner}/{repo}/pulls/{pullNumber}/comments")
     Call<List<ReviewComment>> listRevCom(@Header("Authorization") String accessToken,
                                          @Header("Accept") String apiVersionSpec,
                                          @Path("repo") String repo,
                                          @Path("owner") String owner,
-                                         @Path("pull_number") Integer pullNum);
+                                         @Path("pullNumber") Integer pullNum);
 
     @POST("user/repos")
     Call<Repository> createRepo(@Body Repository repo, @Header("Authorization") String accessToken,
                                 @Header("Accept") String apiVersionSpec,
                                 @Header("Content-Type") String contentType);
 
-    @POST("/repos/{owner}/{repo}/pulls/{pull_number}/comments")
+    @POST("/repos/{owner}/{repo}/pulls/{pullNumber}/comments")
     Call<ReviewComment> createRevComm(@Body ReviewComment reviewComment,
                                       @Header("Authorization") String accessToken,
                                       @Header("Accept") String apiVersionSpec,
-                                      @Header("Content-Type") String contentType);
+                                      @Header("Content-Type") String contentType,
+                                      @Path("repo") String repo,
+                                      @Path("owner") String owner,
+                                      @Path("pullNumber") Integer pullNum);
+
+    @POST("/repos/{owner}/{repo}/issues/{issue_number}/comments")
+    Call<Issue> createIssueComm(@Body Issue reviewComment,
+                                      @Header("Authorization") String accessToken,
+                                      @Header("Accept") String apiVersionSpec,
+                                      @Header("Content-Type") String contentType,
+                                      @Path("repo") String repo,
+                                      @Path("owner") String owner,
+                                      @Path("issue_number") Integer pullNum);
 }
