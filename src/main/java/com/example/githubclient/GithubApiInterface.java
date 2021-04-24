@@ -30,7 +30,7 @@ public interface GithubApiInterface {
                                  @Path("repo") String repo,
                                  @Path("owner") String owner);
 
-    @GET("/repos/{owner}/{repo}/pulls/{pull_number}/reviews")
+    @GET("/repos/{owner}/{repo}/pulls/{pull_number}/comments")
     Call<List<ReviewComment>> listRevCom(@Header("Authorization") String accessToken,
                                          @Header("Accept") String apiVersionSpec,
                                          @Path("repo") String repo,
@@ -41,4 +41,10 @@ public interface GithubApiInterface {
     Call<Repository> createRepo(@Body Repository repo, @Header("Authorization") String accessToken,
                                 @Header("Accept") String apiVersionSpec,
                                 @Header("Content-Type") String contentType);
+
+    @POST("/repos/{owner}/{repo}/pulls/{pull_number}/comments")
+    Call<ReviewComment> createRevComm(@Body ReviewComment reviewComment,
+                                      @Header("Authorization") String accessToken,
+                                      @Header("Accept") String apiVersionSpec,
+                                      @Header("Content-Type") String contentType);
 }

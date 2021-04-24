@@ -2,7 +2,6 @@ package com.example.githubclient;
 
 
 import com.example.githubclient.Model.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -10,8 +9,11 @@ import java.util.List;
 
 @RestController
 public class GitHubClientController {
-    @Autowired
-    private GithubClient githubService;
+    private final GithubClient githubService;
+
+    public GitHubClientController(GithubClient githubService) {
+        this.githubService = githubService;
+    }
 
 
     @GetMapping("/repos")
@@ -49,6 +51,11 @@ public class GitHubClientController {
     @PostMapping("/repos")
     public Repository createRepo(@RequestBody Repository newRepo) throws IOException {
         return githubService.createRepository(newRepo);
+    }
+
+    @PostMapping("/pull/{owner}/{repo}/pulls/{pull_number}/comments")
+    public ReviewComment createRevComm(@RequestBody String newRevComm) throws IOException{
+        return githubService.createRevComm(newRevComm);
     }
 /*
     @DeleteMapping("/repos/{owner}/{repo}")

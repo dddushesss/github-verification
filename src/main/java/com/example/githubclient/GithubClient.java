@@ -27,7 +27,7 @@ public class GithubClient {
                 .build();
 
         service = retrofit.create(GithubApiInterface.class);
-        this.accessToken = "token " + "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";
+        this.accessToken = "token " + "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";
     }
 
     public List<Repository> getRepositories() throws IOException {
@@ -121,6 +121,19 @@ public class GithubClient {
                     ? response.errorBody().string() : "Unknown error");
         }
 
+
+        return response.body();
+    }
+
+    public ReviewComment createRevComm(String comment) throws IOException {
+        Call<ReviewComment> retrofitCall = service.createRevComm(new ReviewComment(comment), accessToken, API_VERSION_SPEC, JSON_CONTENT_TYPE);
+
+        Response<ReviewComment> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
 
         return response.body();
     }
