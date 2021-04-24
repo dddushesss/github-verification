@@ -27,7 +27,8 @@ public class GithubClient {
                 .build();
 
         service = retrofit.create(GithubApiInterface.class);
-        this.accessToken = "token " + "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";
+
+        this.accessToken = "token " + System.getenv("GitHubToken");
     }
 
     public List<Repository> getRepositories() throws IOException {
