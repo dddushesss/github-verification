@@ -22,15 +22,15 @@ public class GitHubClientController {
     }
 
     @GetMapping("/pulls/{owner}/{repo}")
-    public List<PullRequest> getPuls(@PathVariable("owner") String owner,
-                                     @PathVariable("repo") String repoName) throws IOException {
+    public List<PullRequest> getPulls(@PathVariable("owner") String owner,
+                                      @PathVariable("repo") String repoName) throws IOException {
         return githubService.getPullRequests(owner, repoName);
     }
 
     @GetMapping("/pull/{owner}/{repo}/{pullNumber}")
-    public List<PullInfo> getComits(@PathVariable("owner") String owner,
-                                    @PathVariable("repo") String repoName,
-                                    @PathVariable("pullNumber") Integer pullNumber) throws IOException {
+    public List<PullInfo> getCommits(@PathVariable("owner") String owner,
+                                     @PathVariable("repo") String repoName,
+                                     @PathVariable("pullNumber") Integer pullNumber) throws IOException {
         return githubService.getPullRequests(owner, repoName, pullNumber);
     }
 

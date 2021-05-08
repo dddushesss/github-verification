@@ -13,12 +13,12 @@ import java.util.List;
 @Service
 public class GithubClient {
 
-    private String accessToken;
+    private final String accessToken;
     static final String API_BASE_URL = "https://api.github.com/";
     static final String API_VERSION_SPEC = "application/vnd.github.v3+json";
     static final String JSON_CONTENT_TYPE = "application/json";
 
-    private GithubApiInterface service;
+    private final GithubApiInterface service;
 
     public GithubClient() {
         Retrofit retrofit = new Retrofit.Builder()
