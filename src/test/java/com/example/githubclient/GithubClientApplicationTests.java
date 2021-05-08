@@ -9,6 +9,4 @@ public class GithubClientApplicationTests extends AbstractTest {
     public void contextLoads() {
     }
 
-
-
 }
