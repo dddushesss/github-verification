@@ -3,7 +3,6 @@ package com.example.githubclient;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 
 public class MessageTemplateVerifierTest extends AbstractTest {
@@ -55,5 +54,11 @@ public class MessageTemplateVerifierTest extends AbstractTest {
     public void processGeneratorMovedTest() {
         String test = MessageTemplateVerifier.process("GENERATOR 1022 Moved 123");
         assertEquals(test, "Commit test result:\nOK");
+    }
+
+    @Test
+    public void processErrorMessageTest() {
+        String test = MessageTemplateVerifier.process("Привет, я сделял дз, проверьте, ато я валнуюсь");
+        assertEquals(test, MessageTemplateVerifier.VERIFICATION_RESULT + MessageTemplateVerifier.ERROR_RESULT);
     }
 }
