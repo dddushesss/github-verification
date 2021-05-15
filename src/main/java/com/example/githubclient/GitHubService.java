@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class GitHubTestService  {
+public class GitHubService {
     private final GithubClient client;
 
-    public GitHubTestService(GithubClient client) throws IOException {
+    public GitHubService(GithubClient client) {
         this.client = client;
     }
 
