@@ -70,7 +70,7 @@ public class GithubClient {
         return response.body();
     }
 
-    public List<PullInfo> getPullRequests(String owner, String repoName, Integer pullName) throws IOException {
+    public List<PullInfo> getPullRequest(String owner, String repoName, Integer pullName) throws IOException {
         Call<List<PullInfo>> retrofitCall = service.listPullCommits(accessToken, API_VERSION_SPEC, repoName, owner, pullName);
 
         Response<List<PullInfo>> response = retrofitCall.execute();

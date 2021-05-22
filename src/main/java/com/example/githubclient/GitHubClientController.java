@@ -10,9 +10,11 @@ import java.util.List;
 @RestController
 public class GitHubClientController {
     private final GithubClient githubService;
+    private final DatabaseService databaseService;
 
-    public GitHubClientController(GithubClient githubService) {
+    public GitHubClientController(GithubClient githubService, DatabaseService databaseService) {
         this.githubService = githubService;
+        this.databaseService = databaseService;
     }
 
 
@@ -31,7 +33,7 @@ public class GitHubClientController {
     public List<PullInfo> getCommits(@PathVariable("owner") String owner,
                                      @PathVariable("repo") String repoName,
                                      @PathVariable("pullNumber") Integer pullNumber) throws IOException {
-        return githubService.getPullRequests(owner, repoName, pullNumber);
+        return githubService.getPullRequest(owner, repoName, pullNumber);
     }
 
     @GetMapping("/{owner}/{repo}/{issue_number}/issues")
@@ -69,4 +71,10 @@ public class GitHubClientController {
                                        @PathVariable("pull_number") Integer pullNum) throws IOException{
         return githubService.createIssueComm(newIssueComm, owner, repo, pullNum);
     }
+
+    @GetMapping("/users")
+    public List<String> getUsers() {
+        return databaseService.getUser();
+    }
+
 }

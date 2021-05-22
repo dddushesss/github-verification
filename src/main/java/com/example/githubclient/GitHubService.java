@@ -1,7 +1,6 @@
 package com.example.githubclient;
 
-import com.example.githubclient.Model.Commit;
-import com.example.githubclient.Model.Repository;
+import com.example.githubclient.Model.*;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -14,7 +13,9 @@ public class GitHubService {
 
     public GitHubService(GithubClient client) {
         this.client = client;
+
     }
+
 
     public List<Repository> getRepos() throws IOException {
         return client.getRepositories().stream()
@@ -27,4 +28,22 @@ public class GitHubService {
                 }).collect(Collectors.toList());
 
     }
+
+    public List<PullRequest> getPulls() throws IOException{
+        return client.getPullRequests("TestOwner","")
+                .stream()
+                .peek(x -> x.setUser(new User("Test User")))
+                .collect(Collectors.toList());
+    }
+
+    public List<PullInfo> getPull() throws IOException{
+
+        return client.getPullRequest("TestOwner","", 1)
+                .stream()
+                .peek(x -> x.setCommit(new Commit("Test commit")))
+                .collect(Collectors.toList());
+
+    }
+
+
 }
