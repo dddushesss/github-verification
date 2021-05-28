@@ -1,5 +1,6 @@
 package com.example.githubclient;
 
+import com.example.githubclient.Model.*;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;
 import retrofit2.Response;
@@ -12,12 +13,12 @@ import java.util.List;
 @Service
 public class GithubClient {
 
-    private String accessToken;
+    private final String accessToken;
     static final String API_BASE_URL = "https://api.github.com/";
     static final String API_VERSION_SPEC = "application/vnd.github.v3+json";
     static final String JSON_CONTENT_TYPE = "application/json";
 
-    private GithubApiInterface service;
+    private final GithubApiInterface service;
 
     public GithubClient() {
         Retrofit retrofit = new Retrofit.Builder()
@@ -26,7 +27,8 @@ public class GithubClient {
                 .build();
 
         service = retrofit.create(GithubApiInterface.class);
-        this.accessToken = "token " + "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";
+
+        this.accessToken = "token " + System.getenv("GitHubToken");
     }
 
     public List<Repository> getRepositories() throws IOException {
@@ -42,8 +44,8 @@ public class GithubClient {
         return response.body();
     }
 
-    public List<PullRequest> getPullRequses(String owner, String repoName) throws IOException {
-        Call<List<PullRequest>> retrofitCall = service.listPuls(accessToken, API_VERSION_SPEC, repoName, owner);
+    public List<PullRequest> getPullRequests(String owner, String repoName) throws IOException {
+        Call<List<PullRequest>> retrofitCall = service.listPulls(accessToken, API_VERSION_SPEC, repoName, owner);
 
         Response<List<PullRequest>> response = retrofitCall.execute();
 
@@ -67,21 +69,8 @@ public class GithubClient {
 
         return response.body();
     }
-/*
-    public DeletePayload deleteRepository(String owner, String repoName) throws IOException {
-        Call<DeletePayload> retrofitCall = service.deleteRepo(accessToken, API_VERSION_SPEC, repoName, owner);
 
-        Response<DeletePayload> response = retrofitCall.execute();
-
-        if (!response.isSuccessful()) {
-            throw new IOException(response.errorBody() != null
-                    ? response.errorBody().string() : "Unknown error");
-        }
-
-        return response.body();
-    }
-*/
-    public List<PullInfo> getPullRequset(String owner, String repoName, Integer pullName) throws IOException {
+    public List<PullInfo> getPullRequest(String owner, String repoName, Integer pullName) throws IOException {
         Call<List<PullInfo>> retrofitCall = service.listPullCommits(accessToken, API_VERSION_SPEC, repoName, owner, pullName);
 
         Response<List<PullInfo>> response = retrofitCall.execute();
@@ -94,4 +83,69 @@ public class GithubClient {
 
         return response.body();
     }
+
+    public List<Issue> getRepoIssues(String owner, String repo, Integer issueNum) throws IOException {
+        Call<List<Issue>> retrofitCall = service.listIssues(accessToken, API_VERSION_SPEC,repo, owner, issueNum);
+
+        Response<List<Issue>> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+
+
+        return response.body();
+    }
+
+    public List<ReviewComment> getReview(String owner, String repo, Integer pullNum) throws IOException {
+        Call<List<ReviewComment>> retrofitCall = service.listRevCom(accessToken, API_VERSION_SPEC, repo, owner, pullNum);
+
+        Response<List<ReviewComment>> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+
+
+        return response.body();
+    }
+
+    public ReviewComment createRevComm(ReviewComment comment, String owner, String repo, Integer pullNum) throws IOException {
+        Call<ReviewComment> retrofitCall = service.createRevComm(
+                comment,
+                accessToken,
+                API_VERSION_SPEC,
+                JSON_CONTENT_TYPE,
+                repo, owner, pullNum);
+
+        Response<ReviewComment> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+
+        return response.body();
+    }
+
+    public Issue createIssueComm(Issue comment, String owner, String repo, Integer pullNum) throws IOException {
+        Call<Issue> retrofitCall = service.createIssueComm(
+                comment,
+                accessToken,
+                API_VERSION_SPEC,
+                JSON_CONTENT_TYPE,
+                repo, owner, pullNum);
+
+        Response<Issue> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+
+        return response.body();
+    }
+
 }

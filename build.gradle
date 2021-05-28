@@ -24,9 +24,12 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-jdbc'
     compile('org.springframework.boot:spring-boot-starter-web')
     testCompile('org.springframework.boot:spring-boot-starter-test')
     compile('javax.xml.bind:jaxb-api:2.3.0')
     implementation('com.squareup.retrofit2:retrofit:2.4.0')
     implementation('com.squareup.retrofit2:converter-gson:2.4.0')
+
+    implementation 'com.microsoft.sqlserver:mssql-jdbc:8.2.1.jre11'
 }
