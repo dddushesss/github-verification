@@ -8,4 +8,5 @@ public class Student {
     private String Repository;
     private String Last_Name;
     private String Firs_Name;
+    private int id;
 }

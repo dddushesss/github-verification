@@ -16,6 +16,7 @@ public class StudentMapper implements RowMapper<Student> {
         student.setLast_Name(rs.getString("Last_Name"));
         student.setRepository(rs.getString("Repository"));
         student.setGitLogin(rs.getString("GitLogin"));
+        student.setId(rs.getInt("id"));
         return student;
     }
 }

@@ -3,18 +3,24 @@ package com.example.githubclient;
 import com.example.githubclient.Model.Issue;
 import com.example.githubclient.Services.DatabaseService;
 import com.example.githubclient.Services.GithubClient;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class TelegramBot extends TelegramLongPollingBot {
@@ -28,12 +34,18 @@ public class TelegramBot extends TelegramLongPollingBot {
     private final ReplyKeyboardMarkup replyKeyboardMarkup;
 
     public TelegramBot() {
+        List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add(new KeyboardButton("Вывести всех студентов"));
         keyboardRow.add(new KeyboardButton("Проверить все репозитории"));
         keyboardRow.add(new KeyboardButton("Удалить все коменты"));
+        KeyboardRow keyboardRow2 = new KeyboardRow();
+        keyboardRow.add(new KeyboardButton("Добавить студента"));
+        keyboardRow.add(new KeyboardButton("Удалить студента"));
+        keyboardRowList.add(keyboardRow);
+        keyboardRowList.add(keyboardRow2);
         replyKeyboardMarkup = new ReplyKeyboardMarkup();
-        replyKeyboardMarkup.setKeyboard(Collections.singletonList(keyboardRow));
+        replyKeyboardMarkup.setKeyboard(keyboardRowList);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         replyKeyboardMarkup.setResizeKeyboard(true);
     }
@@ -72,8 +84,14 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private String getStudents() {
         StringBuilder result = new StringBuilder();
-
-        databaseService.getStudents().forEach(x -> result.append(x.getFirs_Name()).append(" ").append(x.getLast_Name()).append(" ").append(x.getGitLogin()).append('\n'));
+        if(databaseService.getStudents().size() == 0){
+            return "Нет студентов в базе";
+        }
+        databaseService.getStudents().forEach(x -> result.append(x.getFirs_Name())
+                .append(" ")
+                .append(x.getLast_Name()).append(" ")
+                .append(x.getGitLogin()).append('\t')
+                .append(x.getRepository()).append('\n'));
         return result.toString();
     }
 
@@ -100,6 +118,29 @@ public class TelegramBot extends TelegramLongPollingBot {
     }
 
 
+    private void DeleteStudent(SendMessage message){
+        InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
+        List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
+        List<InlineKeyboardButton> rowInline = new ArrayList<>();
+        if(databaseService.getStudents().size() == 0){
+            message.setText("В базе нет студентов");
+            return;
+        }
+        databaseService.getStudents().forEach(x->{
+            InlineKeyboardButton keyboardButton = new InlineKeyboardButton(x.getFirs_Name() + " " + x.getLast_Name() + "\t" + x.getRepository());
+            keyboardButton.setCallbackData("ToDelete " + x.getId());
+            rowInline.add(keyboardButton);
+        });
+
+        rowsInline.add(rowInline);
+        markupInline.setKeyboard(rowsInline);
+        message.setReplyMarkup(markupInline);
+        message.setText("Выберете студента: ");
+    }
+
+
+
+    @SneakyThrows
     @Override
     public void onUpdateReceived(Update update) {
         if (update.hasMessage() && update.getMessage().hasText()) {
@@ -109,6 +150,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             switch (update.getMessage().getText()) {
                 case "Вывести всех студентов":
                     sendMessage.setText(getStudents());
+                    sendMessage.disableWebPagePreview();
                     break;
                 case "/start":
                     sendMessage.setText("Тут можно докапываться до студентов");
@@ -119,14 +161,36 @@ public class TelegramBot extends TelegramLongPollingBot {
                 case "Удалить все коменты":
                     sendMessage.setText(deleteAllComments());
                     break;
+                case "Удалить студента":
+                    DeleteStudent(sendMessage);
+                    break;
+                case "Добавить студента":
+                    sendMessage.setText("Введите Имя Фамилию Логин гитхаба и репозиторий");
+                    break;
                 default:
-                    sendMessage.setText("Я не понимат");
+                    if(update.getMessage().getText().split(" ").length == 4){
+                        databaseService.addStudent(String.join("','", update
+                                .getMessage()
+                                .getText()
+                                .split(" ")));
+                        sendMessage.setText("Студент добавлен");
+                    }
+                    else {
+                        sendMessage.setText("Я не понимат");
+                    }
                     break;
             }
             try {
                 execute(sendMessage);
             } catch (TelegramApiException e) {
                 e.printStackTrace();
+            }
+        }
+        else if(update.hasCallbackQuery()){
+            String[] data = update.getCallbackQuery().getData().split(" ");
+            if ("ToDelete".equals(data[0])) {
+                databaseService.deleteStudent(Integer.parseInt(data[1]));
+                execute(new SendMessage(String.valueOf(update.getMessage().getChatId()), "Удалено"));
             }
         }
     }
