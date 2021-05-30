@@ -31,6 +31,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add(new KeyboardButton("Вывести всех студентов"));
         keyboardRow.add(new KeyboardButton("Проверить все репозитории"));
+        keyboardRow.add(new KeyboardButton("Удалить все коменты"));
         replyKeyboardMarkup = new ReplyKeyboardMarkup();
         replyKeyboardMarkup.setKeyboard(Collections.singletonList(keyboardRow));
         replyKeyboardMarkup.setOneTimeKeyboard(false);
@@ -76,6 +77,28 @@ public class TelegramBot extends TelegramLongPollingBot {
         return result.toString();
     }
 
+    private String deleteAllComments() {
+        StringBuilder result = new StringBuilder();
+        databaseService.getStudents()
+                .forEach(student -> {
+                    String repo = student.getRepository().substring(student.getRepository().lastIndexOf("/") + 1);
+                    try {
+                        githubClient.getRepoIssues(student.getGitLogin(), repo).forEach(issue -> {
+                            try {
+                                githubClient.deleteReviews(student.getGitLogin(), repo, issue.getId());
+                            } catch (IOException e) {
+                                result.append(e.getMessage()).append("\n\n");
+                            }
+                        });
+                    } catch (IOException e) {
+                        result.append(e.getMessage()).append("\n\n");
+                    }
+                });
+
+        result.append("Удаление закончено");
+        return result.toString();
+    }
+
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -83,7 +106,7 @@ public class TelegramBot extends TelegramLongPollingBot {
             SendMessage sendMessage = new SendMessage();
             sendMessage.setReplyMarkup(replyKeyboardMarkup);
             sendMessage.setChatId(String.valueOf(update.getMessage().getChatId()));
-            switch (update.getMessage().getText()){
+            switch (update.getMessage().getText()) {
                 case "Вывести всех студентов":
                     sendMessage.setText(getStudents());
                     break;
@@ -92,6 +115,9 @@ public class TelegramBot extends TelegramLongPollingBot {
                     break;
                 case "Проверить все репозитории":
                     sendMessage.setText(checkRepos());
+                    break;
+                case "Удалить все коменты":
+                    sendMessage.setText(deleteAllComments());
                     break;
                 default:
                     sendMessage.setText("Я не понимат");

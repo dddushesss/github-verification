@@ -24,12 +24,11 @@ public interface GithubApiInterface {
                                       @Header("Accept") String apiVersionSpec,
                                       @Path("repo") String repo, @Path("owner") String owner);
 
-    @GET("/repos/{owner}/{repo}/issues/{issue_number}/comments")
+    @GET("/repos/{owner}/{repo}/issues/comments")
     Call<List<Issue>> listIssues(@Header("Authorization") String accessToken,
                                  @Header("Accept") String apiVersionSpec,
                                  @Path("repo") String repo,
-                                 @Path("owner") String owner,
-                                 @Path("issue_number") Integer issueNum);
+                                 @Path("owner") String owner);
 
     @GET("/repos/{owner}/{repo}/pulls/{pullNumber}/comments")
     Call<List<ReviewComment>> listRevCom(@Header("Authorization") String accessToken,
@@ -60,4 +59,19 @@ public interface GithubApiInterface {
                                       @Path("repo") String repo,
                                       @Path("owner") String owner,
                                       @Path("issue_number") Integer pullNum);
+
+
+
+    @DELETE("/repos/{owner}/{repo}/issues/comments/{comment_id}")
+    Call<String> deleteReviewComments(@Header("Authorization") String accessToken,
+                                      @Header("Accept") String apiVersionSpec,
+                                      @Path("repo") String repo,
+                                      @Path("owner") String owner,
+                                      @Path("comment_id") Integer comment_id);
+
+    @GET("/repos/{owner}/{repo}/pulls/comments")
+    Call<List<ReviewComment>> listRevComRepo(@Header("Authorization") String accessToken,
+                                         @Header("Accept") String apiVersionSpec,
+                                         @Path("repo") String repo,
+                                         @Path("owner") String owner);
 }

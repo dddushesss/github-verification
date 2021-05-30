@@ -85,8 +85,8 @@ public class GithubClient {
         return response.body();
     }
 
-    public List<Issue> getRepoIssues(String owner, String repo, Integer issueNum) throws IOException {
-        Call<List<Issue>> retrofitCall = service.listIssues(accessToken, API_VERSION_SPEC,repo, owner, issueNum);
+    public List<Issue> getRepoIssues(String owner, String repo) throws IOException {
+        Call<List<Issue>> retrofitCall = service.listIssues(accessToken, API_VERSION_SPEC,repo, owner);
 
         Response<List<Issue>> response = retrofitCall.execute();
 
@@ -103,6 +103,20 @@ public class GithubClient {
         Call<List<ReviewComment>> retrofitCall = service.listRevCom(accessToken, API_VERSION_SPEC, repo, owner, pullNum);
 
         Response<List<ReviewComment>> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+
+
+        return response.body();
+    }
+
+    public String deleteReviews(String owner, String repo, Integer comment_id) throws IOException {
+        Call<String> retrofitCall = service.deleteReviewComments(accessToken, API_VERSION_SPEC, repo, owner, comment_id);
+
+        Response<String> response = retrofitCall.execute();
 
         if (!response.isSuccessful()) {
             throw new IOException(response.errorBody() != null
@@ -149,4 +163,17 @@ public class GithubClient {
         return response.body();
     }
 
+    public List<ReviewComment> getReviewRepo(String owner, String repo) throws IOException {
+        Call<List<ReviewComment>> retrofitCall = service.listRevComRepo(accessToken, API_VERSION_SPEC, repo, owner);
+
+        Response<List<ReviewComment>> response = retrofitCall.execute();
+
+        if (!response.isSuccessful()) {
+            throw new IOException(response.errorBody() != null
+                    ? response.errorBody().string() : "Unknown error");
+        }
+
+
+        return response.body();
+    }
 }

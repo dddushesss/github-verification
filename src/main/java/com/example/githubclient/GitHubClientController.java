@@ -35,18 +35,17 @@ public class GitHubClientController {
         return githubService.getPullRequest(owner, repoName, pullNumber);
     }
 
-    @GetMapping("/{owner}/{repo}/{issue_number}/issues")
+    @GetMapping("/{owner}/{repo}//issues")
     public List<Issue> getIssues(@PathVariable("owner") String owner,
-                                 @PathVariable("repo") String repoName,
-                                 @PathVariable("issue_number") Integer pullNum
-                                   ) throws IOException {
-        return githubService.getRepoIssues(owner, repoName, pullNum);
+                                 @PathVariable("repo") String repoName
+    ) throws IOException {
+        return githubService.getRepoIssues(owner, repoName);
     }
 
     @GetMapping("/pull/{owner}/{repo}/{pull_number}/comments")
     public List<ReviewComment> getRevComs(@PathVariable("owner") String owner,
                                           @PathVariable("repo") String repo,
-                                          @PathVariable("pull_number") Integer pullNum) throws IOException{
+                                          @PathVariable("pull_number") Integer pullNum) throws IOException {
         return githubService.getReview(owner, repo, pullNum);
     }
 
@@ -59,15 +58,15 @@ public class GitHubClientController {
     public ReviewComment createRevComm(@RequestBody ReviewComment newRevComm,
                                        @PathVariable("owner") String owner,
                                        @PathVariable("repo") String repo,
-                                       @PathVariable("pull_number") Integer pullNum) throws IOException{
+                                       @PathVariable("pull_number") Integer pullNum) throws IOException {
         return githubService.createRevComm(newRevComm, owner, repo, pullNum);
     }
 
     @PostMapping("/pull/{owner}/{repo}/pulls/{pull_number}/issuecomments")
     public Issue createIssueComment(@RequestBody Issue newIssueComm,
-                                       @PathVariable("owner") String owner,
-                                       @PathVariable("repo") String repo,
-                                       @PathVariable("pull_number") Integer pullNum) throws IOException{
+                                    @PathVariable("owner") String owner,
+                                    @PathVariable("repo") String repo,
+                                    @PathVariable("pull_number") Integer pullNum) throws IOException {
         return githubService.createIssueComm(newIssueComm, owner, repo, pullNum);
     }
 
@@ -76,4 +75,16 @@ public class GitHubClientController {
         return databaseService.getStudents();
     }
 
+    @DeleteMapping("/{owner}/{repo}/{comment_id}/deleteReviews")
+    public String deleteReviews(@PathVariable("owner") String owner,
+                                @PathVariable("repo") String repo,
+                                @PathVariable("comment_id") Integer comment_id) throws IOException {
+        return githubService.deleteReviews(owner, repo, comment_id);
+    }
+
+    @GetMapping("/pull/{owner}/{repo}/comments")
+    public List<ReviewComment> getRevComsRepo(@PathVariable("owner") String owner,
+                                 @PathVariable("repo") String repo) throws IOException {
+        return githubService.getReviewRepo(owner, repo);
+    }
 }
