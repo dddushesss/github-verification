@@ -9,4 +9,8 @@ public class Issue {
     public User user;
     @SerializedName("body")
     public String body;
+
+    public Issue(String body){
+        this.body = body;
+    }
 }

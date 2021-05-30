@@ -1,11 +1,11 @@
 package com.example.githubclient;
 
 import com.example.githubclient.Model.*;
+import com.example.githubclient.Services.GitHubService;
+import com.example.githubclient.Services.GithubClient;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.io.IOException;
 import java.util.Collections;

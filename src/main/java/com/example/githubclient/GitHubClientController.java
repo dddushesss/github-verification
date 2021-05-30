@@ -2,6 +2,9 @@ package com.example.githubclient;
 
 
 import com.example.githubclient.Model.*;
+import com.example.githubclient.Services.DatabaseService;
+import com.example.githubclient.Services.GithubClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -9,14 +12,10 @@ import java.util.List;
 
 @RestController
 public class GitHubClientController {
-    private final GithubClient githubService;
-    private final DatabaseService databaseService;
-
-    public GitHubClientController(GithubClient githubService, DatabaseService databaseService) {
-        this.githubService = githubService;
-        this.databaseService = databaseService;
-    }
-
+    @Autowired
+    private GithubClient githubService;
+    @Autowired
+    private DatabaseService databaseService;
 
     @GetMapping("/repos")
     public List<Repository> getRepos() throws IOException {
@@ -73,8 +72,8 @@ public class GitHubClientController {
     }
 
     @GetMapping("/users")
-    public List<String> getUsers() {
-        return databaseService.getUser();
+    public List<Student> getUsers() {
+        return databaseService.getStudents();
     }
 
 }
