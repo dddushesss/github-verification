@@ -1,6 +1,5 @@
 package com.example.githubclient;
 
-
 import com.example.githubclient.Model.*;
 import com.example.githubclient.Services.GitHubService;
 import com.example.githubclient.Services.GithubClient;

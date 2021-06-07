@@ -1,8 +1,8 @@
 package com.example.githubclient.Services;
 
-
 import com.example.githubclient.Model.Student;
 import com.example.githubclient.Model.StudentMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -10,30 +10,23 @@ import java.util.List;
 
 @Repository
 public class DatabaseService {
-    private final JdbcTemplate jdbcTemplate;
-    private final StudentMapper studentMapper;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+    @Autowired
+    private StudentMapper studentMapper;
 
-    public DatabaseService(JdbcTemplate jdbcTemplate, StudentMapper studentMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.studentMapper = studentMapper;
-    }
 
     public List<Student> getStudents() {
         return jdbcTemplate.query("select * from Student", studentMapper);
     }
 
     public void deleteStudent(int id){
-        String sqlQuery = "delete from Student where id =" + id;
+        String sqlQuery = "SET NOCOUNT OFF; delete from Student where id =" + id;
         jdbcTemplate.update(sqlQuery);
 
     }
     public void addStudent(String data){
-        String sql = "insert into Student (First_Name, Last_Name, GitLogin, Repository) values ('" + data + "')";
+        String sql = "insert into Student values ('" + data + "')";
         jdbcTemplate.update(sql);
-    }
-
-    public Student getStudentById(int id) {
-        String sql = "SELECT * FROM Student where id = " + id;
-        return jdbcTemplate.queryForObject(sql, studentMapper);
     }
 }

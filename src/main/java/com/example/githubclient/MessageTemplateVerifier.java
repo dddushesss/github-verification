@@ -1,4 +1,4 @@
-package com.example.githubclient.Common;
+package com.example.githubclient;
 
 import java.util.regex.Pattern;
 

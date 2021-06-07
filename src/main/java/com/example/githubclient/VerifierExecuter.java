@@ -1,4 +1,4 @@
-package com.example.githubclient.Common;
+package com.example.githubclient;
 
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 public class VerifierExecuter {
 
 
-    //@Scheduled(cron = "*/5 * * * * *")
+    @Scheduled(cron = "*/5 * * * * *")
     public void verify() {
-        System.out.print("Влад Котов, где ТЗ? Ты же обещал\n");
+        System.out.printf("Влад Котов, где ТЗ? Ты же обещал\n");
     }
 }

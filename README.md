@@ -1,2 +1,5 @@
-Павлов Алексей 202.1.
-Перевел проект на мавен и задеплоил его на heroku, подключил heroku postgressql, подключил бота (@github_checker_bot)
+# Developing a RESTful Client with Retrofit and Spring Boot
+
+Every 5 seconds text prints to console
+On localhost/repos/{owner}/{repo}/pulls/{pull_number}/commits gets all commit messages
+Verification prefix message static class
