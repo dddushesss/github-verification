@@ -1,0 +1,3 @@
+com\example\githubclient\AbstractTest.class
+com\example\githubclient\GithubServiceTest.class
+com\example\githubclient\MessageTemplateVerifierTest.class
