@@ -2,11 +2,14 @@ package com.example.githubclient;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-public class GithubClientApplication {
+@EnableScheduling
+public class GitVerificationBotApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(GithubClientApplication.class, args);
+        SpringApplication.run(GitVerificationBotApplication.class, args);
     }
+
 }

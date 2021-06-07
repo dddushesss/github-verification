@@ -1,37 +1,38 @@
-package com.example.githubclient;
+package com.example.githubclient.Bot.Common;
 
+import com.example.githubclient.Common.MessageTemplateVerifier;
 import com.example.githubclient.Model.Issue;
+import com.example.githubclient.Model.Student;
 import com.example.githubclient.Services.DatabaseService;
 import com.example.githubclient.Services.GithubClient;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-@Component
-public class TelegramBot extends TelegramLongPollingBot {
+public class TelegramBotHandler {
 
-    @Autowired
-    private DatabaseService databaseService;
-    @Autowired
-    private GithubClient githubClient;
-    private final String TOKEN = System.getenv("telegram_bot_token");
-    private final String LOGIN = System.getenv("telegram_bot_login");
-    private final ReplyKeyboardMarkup replyKeyboardMarkup;
+    private final Update update;
+    private final DatabaseService databaseService;
+    private final GithubClient githubClient;
 
-    public TelegramBot() {
+    public TelegramBotHandler(Update update, DatabaseService databaseService, GithubClient githubClient) {
+        this.update = update;
+        this.databaseService = databaseService;
+        this.githubClient = githubClient;
+    }
+
+
+    private ReplyKeyboardMarkup initKeyboard() {
+        ReplyKeyboardMarkup replyKeyboardMarkup;
         List<KeyboardRow> keyboardRowList = new ArrayList<>();
         KeyboardRow keyboardRow = new KeyboardRow();
         keyboardRow.add(new KeyboardButton("Вывести всех студентов"));
@@ -46,20 +47,12 @@ public class TelegramBot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setKeyboard(keyboardRowList);
         replyKeyboardMarkup.setOneTimeKeyboard(false);
         replyKeyboardMarkup.setResizeKeyboard(true);
-    }
-
-    @Override
-    public String getBotUsername() {
-        return LOGIN;
-    }
-
-    @Override
-    public String getBotToken() {
-        return TOKEN;
+        return replyKeyboardMarkup;
     }
 
     private String checkRepos() {
         StringBuilder result = new StringBuilder();
+
 
         databaseService.getStudents().forEach(student -> {
             String repo = student.getRepository().substring(student.getRepository().lastIndexOf("/") + 1);
@@ -82,6 +75,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private String getStudents() {
         StringBuilder result = new StringBuilder();
+
+
         if (databaseService.getStudents().size() == 0) {
             return "Нет студентов в базе";
         }
@@ -95,6 +90,8 @@ public class TelegramBot extends TelegramLongPollingBot {
 
     private String deleteAllComments() {
         StringBuilder result = new StringBuilder();
+
+
         databaseService.getStudents()
                 .forEach(student -> {
                     String repo = student.getRepository().substring(student.getRepository().lastIndexOf("/") + 1);
@@ -115,8 +112,7 @@ public class TelegramBot extends TelegramLongPollingBot {
         return result.toString();
     }
 
-
-    private void DeleteStudent(SendMessage message) {
+    private void deleteStudent(SendMessage message) {
         InlineKeyboardMarkup markupInline = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rowsInline = new ArrayList<>();
         if (databaseService.getStudents().size() == 0) {
@@ -136,57 +132,64 @@ public class TelegramBot extends TelegramLongPollingBot {
         message.setText("Выберете студента: ");
     }
 
+    public SendMessage keyboardHandler(Update update) {
+        SendMessage sendMessage = new SendMessage();
 
-    @SneakyThrows
-    @Override
-    public void onUpdateReceived(Update update) {
-        if (update.hasMessage() && update.getMessage().hasText()) {
-            SendMessage sendMessage = new SendMessage();
-            sendMessage.setReplyMarkup(replyKeyboardMarkup);
-            sendMessage.setChatId(String.valueOf(update.getMessage().getChatId()));
-            switch (update.getMessage().getText()) {
-                case "Вывести всех студентов":
-                    sendMessage.setText(getStudents());
-                    sendMessage.disableWebPagePreview();
-                    break;
-                case "/start":
-                    sendMessage.setText("Тут можно докапываться до студентов");
-                    break;
-                case "Проверить все репозитории":
-                    sendMessage.setText(checkRepos());
-                    break;
-                case "Удалить все коменты":
-                    sendMessage.setText(deleteAllComments());
-                    break;
-                case "Удалить студента":
-                    DeleteStudent(sendMessage);
-                    break;
-                case "Добавить студента":
-                    sendMessage.setText("Введите Имя Фамилию Логин гитхаба и репозиторий");
-                    break;
-                default:
-                    if (update.getMessage().getText().split(" ").length == 4) {
-                        databaseService.addStudent(String.join("','", update
-                                .getMessage()
-                                .getText()
-                                .split(" ")));
-                        sendMessage.setText("Студент добавлен");
-                    } else {
-                        sendMessage.setText("Я не понимат");
-                    }
-                    break;
-            }
-            try {
-                execute(sendMessage);
-            } catch (TelegramApiException e) {
-                e.printStackTrace();
-            }
-        } else if (update.hasCallbackQuery()) {
-            String[] data = update.getCallbackQuery().getData().split(" ");
-            if ("ToDelete".equals(data[0])) {
-                databaseService.deleteStudent(Integer.parseInt(data[1]));
-                execute(new SendMessage(data[2], "Удалено"));
-            }
+        sendMessage.setChatId(String.valueOf(update.getMessage().getChatId()));
+        String msg = update.getMessage().getText();
+        switch (msg) {
+            case "Вывести всех студентов":
+                sendMessage.setText(getStudents());
+                sendMessage.disableWebPagePreview();
+                break;
+            case "/start":
+                sendMessage.setReplyMarkup(initKeyboard());
+                sendMessage.setText("Тут можно докапываться до студентов");
+                break;
+            case "Проверить все репозитории":
+                sendMessage.setText(checkRepos());
+                break;
+            case "Удалить все коменты":
+                sendMessage.setText(deleteAllComments());
+                break;
+            case "Удалить студента":
+                deleteStudent(sendMessage);
+                break;
+            case "Добавить студента":
+                sendMessage.setText("Введите Имя Фамилию Логин гитхаба и репозиторий");
+                break;
+            default:
+                if (msg.split(" ").length == 4) {
+                    databaseService.addStudent(String.join("','", msg
+                            .split(" ")));
+                    sendMessage.setText("Студент добавлен");
+                } else {
+                    sendMessage.setText("Я не понимат");
+                }
+                break;
         }
+        return sendMessage;
+    }
+
+    public EditMessageText callbackHandler(Update update) {
+        String[] data = update.getCallbackQuery().getData().split(" ");
+        EditMessageText editMessageText = new EditMessageText();
+        switch (data[0]) {
+            case "ToDelete":
+                Student studentToDelete = databaseService.getStudentById(Integer.parseInt(data[1]));
+                editMessageText.setText("Студент "
+                        + studentToDelete.getFirs_Name() + " " + studentToDelete.getLast_Name()
+                        + " удалён");
+                databaseService.deleteStudent(Integer.parseInt(data[1]));
+                editMessageText.setChatId(data[2]);
+                editMessageText.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
+                break;
+            default:
+                editMessageText.setText("Ошибка: студент не найден в базе");
+                editMessageText.setChatId(data[2]);
+                editMessageText.setMessageId(update.getCallbackQuery().getMessage().getMessageId());
+                break;
+        }
+        return editMessageText;
     }
 }

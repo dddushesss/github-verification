@@ -1,4 +1,5 @@
-package com.example.githubclient;
+package com.example.githubclient.Common;
+
 
 
 import com.example.githubclient.Model.*;

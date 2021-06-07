@@ -1,6 +1,7 @@
 package com.example.githubclient.Services;
 
-import com.example.githubclient.GithubApiInterface;
+
+import com.example.githubclient.Common.GithubApiInterface;
 import com.example.githubclient.Model.*;
 import org.springframework.stereotype.Service;
 import retrofit2.Call;

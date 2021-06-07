@@ -6,6 +6,7 @@ import lombok.Data;
 enum PullRequestState{
 
 }
+
 @Data
 public class PullRequest {
     @SerializedName("user")
